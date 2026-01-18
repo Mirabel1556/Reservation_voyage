@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Voyage - Bus Booking</title>
+<style>
+    body {
+        font-family: Arial, sans-serif; 
+        background-color: #f0f8ff;
+        background-image: url('html.jpg');
+        color: #333; 
+        margin: 0;
+    }
+    header {
+        background-color: #004aad; 
+        color: white; 
+        padding: 20px; 
+        text-align: center;
+    }
+    h2 {
+        color: #004aad;
+    }
+    section {
+        max-width: 800px; 
+        margin: auto; 
+        padding: 20px; 
+        display: none;}
+    .active {
+        display: block;
+    }
+    input, select {width: 100%; padding: 8px; margin-bottom: 15px;}
+    button {background-color: #004aad; color:white; border:none; padding:10px 15px; cursor:pointer; margin:5px 0;}
+    button:hover {background-color:#ff9900;}
+    #busImages img {width:200px; margin:10px; cursor:pointer; border:3px solid transparent;}
+    #busImages img.selected {border-color:#004aad;}
+    #ticket {border:2px solid #004aad; padding:20px; margin-top:20px; background-color:#e6f0ff;}
+</style>
+</head>
+<body style="background-image: url('https://www.istockphoto.com/photos/bus-fleet'); background-size: cover;">
+<header>
+    <h1>Royal Voyage</h1>
+    <p>Book your bus ticket across Cameroon</p>
+</header>
+
+<!-- Page 1: Booking Info -->
+<section id="page1" class="active">
+    <h2>Step 1: Enter Booking Info</h2>
+    <form id="bookingForm">
+        <input type="text" id="name" placeholder="Full Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="tel" id="phone" placeholder="Phone Number" required>
+        <select id="departure" required>
+            <option value="">Departure City</option>
+            <option value="Yaoundé">Yaoundé</option>
+            <option value="Douala">Douala</option>
+            <option value="Bafoussam">Bafoussam</option>
+            <option value="Bertoua">Bertoua</option>
+        </select>
+        <select id="destination" required>
+            <option value="">Destination City</option>
+            <option value="Yaoundé">Yaoundé</option>
+            <option value="Douala">Douala</option>
+            <option value="Bafoussam">Bafoussam</option>
+            <option value="Bertoua">Bertoua</option>
+        </select>
+        <input type="date" id="date" required>
+        <select id="class" required>
+            <option value="">Choose Class</option>
+            <option value="Simple">Simple</option>
+            <option value="VIP">VIP</option>
+        </select>
+        <button type="button" onclick="nextPage1()">Next</button>
+    </form>
+</section>
+
+<!-- Page 2: Bus Images -->
+<section id="page2">
+    <h2>Step 2: Choose Your Bus</h2>
+    <div id="busImages">
+        <div>
+            <img src="https://via.placeholder.com/200x100?text=Bus+1" data-price-simple="5000" data-price-vip="8000" onclick="selectBus(this)">
+            <p>Bus 1 Price: Simple - 5000 XAF, VIP - 8000 XAF</p>
+        </div>
+        <div>
+            <img src="https://via.placeholder.com/200x100?text=Bus+2" data-price-simple="5500" data-price-vip="8500" onclick="selectBus(this)">
+            <p>Bus 2 Price: Simple - 5500 XAF, VIP - 8500 XAF</p>
+        </div>
+        <div>
+            <img src="https://via.placeholder.com/200x100?text=Bus+3" data-price-simple="6000" data-price-vip="9000" onclick="selectBus(this)">
+            <p>Bus 3 Price: Simple - 6000 XAF, VIP - 9000 XAF</p>
+        </div>
+    </div>
+    <button onclick="nextPage2()">Next</button>
+</section>
+
+<!-- Page 3: Confirm Info -->
+<section id="page3">
+    <h2>Step 3: Confirm Your Info</h2>
+    <div id="confirmDetails"></div>
+    <button onclick="nextPage3()">Next</button>
+</section>
+
+<!-- Page 4: Payment -->
+<section id="page4">
+    <h2>Step 4: Payment Method</h2>
+    <select id="paymentMethod">
+        <option value="">Choose Payment Method</option>
+        <option value="Mobile Money">Mobile Money</option>
+        <option value="Credit Card">Credit Card</option>
+    </select>
+    <button onclick="nextPage4()">Réserver</button>
+</section>
+
+<!-- Page 5: Ticket -->
+<section id="page5">
+    <h2>Your Ticket</h2>
+    <div id="ticket"></div>
+    <button onclick="window.print()">Print Ticket</button>
+</section>
+
+<script>
+let booking = {}; // store all booking info
+let selectedBus = null;
+
+// Page navigation
+function showPage(id) {
+    document.querySelectorAll('section').forEach(sec=>sec.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+// Page 1 next
+function nextPage1() {
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const departure = document.getElementById('departure').value;
+    const destination = document.getElementById('destination').value;
+    const date = document.getElementById('date').value;
+    const busClass = document.getElementById('class').value;
+
+    if(!name || !email || !phone || !departure || !destination || !date || !busClass || departure===destination){
+        alert('Please fill all fields correctly and departure should be different from destination');
+        return;
+    }
+
+    booking = {name,email,phone,departure,destination,date,busClass};
+    showPage('page2');
+}
+
+// Select Bus
+function selectBus(img){
+    selectedBus = img;
+    document.querySelectorAll('#busImages img').forEach(i=>i.classList.remove('selected'));
+    img.classList.add('selected');
+}
+
+// Page 2 next
+function nextPage2(){
+    if(!selectedBus){
+        alert('Please select a bus');
+        return;
+    }
+    const cls = booking.busClass;
+    const price = selectedBus.dataset['price'+cls];
+    booking.busName = selectedBus.alt || "Bus";
+    booking.price = price;
+    showPage('page3');
+
+    // Fill confirm info
+    document.getElementById('confirmDetails').innerHTML = `
+        <p><strong>Name:</strong> ${booking.name}</p>
+        <p><strong>Email:</strong> ${booking.email}</p>
+        <p><strong>Phone:</strong> ${booking.phone}</p>
+        <p><strong>From:</strong> ${booking.departure}</p>
+        <p><strong>To:</strong> ${booking.destination}</p>
+        <p><strong>Date:</strong> ${booking.date}</p>
+        <p><strong>Class:</strong> ${booking.busClass}</p>
+        <p><strong>Bus:</strong> ${booking.busName}</p>
+        <p><strong>Price:</strong> ${booking.price} XAF</p>
+    `;
+}
+
+// Page 3 next
+function nextPage3(){
+    showPage('page4');
+}
+
+// Page 4 next
+function nextPage4(){
+    const method = document.getElementById('paymentMethod').value;
+    if(!method){
+        alert('Please choose a payment method');
+        return;
+    }
+    booking.payment = method;
+
+    // Generate ticket
+    const t = document.getElementById('ticket');
+    t.innerHTML = `
+        <p><strong>Royal Voyage Ticket</strong></p>
+        <p><strong>Name:</strong> ${booking.name}</p>
+        <p><strong>Email:</strong> ${booking.email}</p>
+        <p><strong>Phone:</strong> ${booking.phone}</p>
+        <p><strong>From:</strong> ${booking.departure}</p>
+        <p><strong>To:</strong> ${booking.destination}</p>
+        <p><strong>Date:</strong> ${booking.date}</p>
+        <p><strong>Class:</strong> ${booking.busClass}</p>
+        <p><strong>Bus:</strong> ${booking.busName}</p>
+        <p><strong>Price:</strong> ${booking.price} XAF</p>
+        <p><strong>Payment Method:</strong> ${booking.payment}</p>
+        <p>Thank you for booking with Royal Voyage!</p>
+    `;
+    showPage('page5');
+}
+</script>
+
+</body>
+</html>
